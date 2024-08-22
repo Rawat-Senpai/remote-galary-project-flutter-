@@ -1,22 +1,15 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
-import 'package:photo_storage_application/ui/bottomNavigationBar.dart';
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:photo_storage_application/ui/registerFolder/registerScreen.dart';
 
-class Loginscreen extends StatefulWidget {
-  const Loginscreen({super.key});
+class RegistrationScreen extends StatefulWidget {
+  const RegistrationScreen({super.key});
 
   @override
-  State<Loginscreen> createState() => _LoginscreenState();
+  State<RegistrationScreen> createState() => _RegistrationScreenState();
 }
 
-class _LoginscreenState extends State<Loginscreen> {
-  // Controllers to retrieve text from TextFields
+class _RegistrationScreenState extends State<RegistrationScreen> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
 
@@ -38,7 +31,7 @@ class _LoginscreenState extends State<Loginscreen> {
                     .start, // Aligning text and fields to start
                 children: [
                   const Text(
-                    "This application allows you to upload photos to the server so that you can use a remote server for a time being. You can view those photos after some time.",
+                    "Register a new account to start using the application.",
                     style: TextStyle(fontSize: 16),
                   ),
                   const SizedBox(
@@ -67,8 +60,6 @@ class _LoginscreenState extends State<Loginscreen> {
                     width: double.infinity, // Full-width button
                     child: ElevatedButton(
                       onPressed: () async {
-                        print("Button is clicked");
-                        // Retrieve text from TextFields
                         String email = emailController.text;
                         String password = passwordController.text;
 
@@ -76,7 +67,7 @@ class _LoginscreenState extends State<Loginscreen> {
                           try {
                             UserCredential userCredential = await FirebaseAuth
                                 .instance
-                                .signInWithEmailAndPassword(
+                                .createUserWithEmailAndPassword(
                               email: email,
                               password: password,
                             );
@@ -84,7 +75,8 @@ class _LoginscreenState extends State<Loginscreen> {
                             User? user = userCredential.user;
                             if (user != null) {
                               Fluttertoast.showToast(
-                                msg: "Login successful. UID: ${user.uid}",
+                                msg:
+                                    "Registration successful. UID: ${user.uid}",
                                 toastLength: Toast.LENGTH_SHORT,
                                 gravity: ToastGravity.BOTTOM,
                                 backgroundColor: Colors.black54,
@@ -92,13 +84,7 @@ class _LoginscreenState extends State<Loginscreen> {
                                 fontSize: 16.0,
                               );
 
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) =>
-                                      BottomNavigationBarExample(), // Replace with your target screen
-                                ),
-                              );
+                              Navigator.pop(context);
                             }
                           } catch (e) {
                             ScaffoldMessenger.of(context).showSnackBar(
@@ -116,24 +102,7 @@ class _LoginscreenState extends State<Loginscreen> {
                           );
                         }
                       },
-                      child: const Text('Login'),
-                    ),
-                  ),
-                  const SizedBox(
-                      height: 10), // Add space before the registration text
-                  Align(
-                    alignment: Alignment.center,
-                    child: TextButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) =>
-                                RegistrationScreen(), // Replace with your registration screen
-                          ),
-                        );
-                      },
-                      child: const Text('Register a new account'),
+                      child: const Text('Register'),
                     ),
                   ),
                 ],

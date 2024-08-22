@@ -4,11 +4,19 @@ import 'package:photo_storage_application/ui/splashScreen.dart';
 import 'package:photo_storage_application/utils/shared_pref.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-void main() async {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
-  // Initialize SharedPreferences
-  await SharedPrefsService.instance.init();
+  try {
+    await Firebase.initializeApp(
+        options: FirebaseOptions(
+            apiKey: 'AIzaSyDIbd-P3sRKDxMt1aqIGDUIPFg7KwPhXUQ',
+            appId: "1:856900350869:android:42083e922601b65ad77c9c",
+            messagingSenderId: "856900350869",
+            projectId: "fluttergalaryproject"));
+    print("Firebase initialization complete");
+  } catch (e) {
+    print("Error initializing Firebase: $e");
+  }
 
   runApp(const MyApp());
 }
