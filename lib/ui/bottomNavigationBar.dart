@@ -40,8 +40,8 @@ class _BottomNavigationBarExampleState
             label: 'Home',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.business),
-            label: 'Business',
+            icon: Icon(Icons.photo_album),
+            label: 'Galary',
           ),
         ],
         currentIndex: _selectedIndex,
