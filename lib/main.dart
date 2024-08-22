@@ -1,3 +1,4 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:photo_storage_application/ui/splashScreen.dart';
 import 'package:photo_storage_application/utils/shared_pref.dart';
@@ -5,7 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
+  await Firebase.initializeApp();
   // Initialize SharedPreferences
   await SharedPrefsService.instance.init();
 

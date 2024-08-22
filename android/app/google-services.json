@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "856900350869",
+    "project_id": "fluttergalaryproject",
+    "storage_bucket": "fluttergalaryproject.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:856900350869:android:42083e922601b65ad77c9c",
+        "android_client_info": {
+          "package_name": "com.example.photo_storage_application"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDIbd-P3sRKDxMt1aqIGDUIPFg7KwPhXUQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
