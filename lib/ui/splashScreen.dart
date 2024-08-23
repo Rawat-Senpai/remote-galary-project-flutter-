@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/placeholder.dart';
@@ -19,8 +20,17 @@ class _SplashScreenState extends State<SplashScreen> {
 
     // Navigate to Home Screen after a delay
     Future.delayed(const Duration(seconds: 2), () {
-      Navigator.pushReplacement(
-          context, MaterialPageRoute(builder: (context) => Loginscreen()));
+      User? user = FirebaseAuth.instance.currentUser;
+
+      if (user != null) {
+        Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+                builder: (context) => BottomNavigationBarExample()));
+      } else {
+        Navigator.pushReplacement(
+            context, MaterialPageRoute(builder: (context) => Loginscreen()));
+      }
     });
   }
 
