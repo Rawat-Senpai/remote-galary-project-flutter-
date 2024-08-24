@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:photo_storage_application/ui/galaryFolder/galaryScreen.dart';
 import 'package:photo_storage_application/ui/homeFolder/HomeScreen.dart';
@@ -28,10 +30,42 @@ class _BottomNavigationBarExampleState
   }
 
   @override
+  void initState() {
+    super.initState();
+    _initializeUser();
+  }
+
+  String userId = '';
+  Map<String, dynamic>? userData;
+
+  void _initializeUser() async {
+    print("user initialization starts ");
+    userId = (await getCurrentUserId()) ?? "";
+
+    if (userId.isNotEmpty) {
+      userData = await getUserDetails(userId);
+      setState(() {
+        print("userData ${userData.toString()}");
+      });
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: _buildAppBar(),
-      drawer: CustomDrawer(),
+      drawer: userData != null
+          ? CustomDrawer(
+              userName: userData?['name'] ?? 'User Name',
+              userEmail: userData?['email'] ?? 'user@example.com',
+              userImage: userData?['image'] ??
+                  '', // Provide a default image URL or path
+            )
+          : const CustomDrawer(
+              userName: 'User Name',
+              userEmail: 'user@example.com',
+              userImage: '', // Provide a default image URL or path
+            ),
       body: Center(
         child: _widgetOptions.elementAt(_selectedIndex),
       ),
@@ -68,7 +102,16 @@ AppBar _buildAppBar() {
 }
 
 class CustomDrawer extends StatelessWidget {
-  const CustomDrawer({super.key});
+  final String userName;
+  final String userEmail;
+  final String userImage;
+
+  const CustomDrawer({
+    super.key,
+    required this.userName,
+    required this.userEmail,
+    required this.userImage,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -104,17 +147,17 @@ class CustomDrawer extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        'User Name',
-                        style: TextStyle(
+                      Text(
+                        userName,
+                        style: const TextStyle(
                           color: Colors.white,
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      const Text(
-                        'user@example.com',
-                        style: TextStyle(
+                      Text(
+                        userEmail,
+                        style: const TextStyle(
                           color: Colors.white,
                           fontSize: 16,
                         ),
@@ -161,5 +204,42 @@ class CustomDrawer extends StatelessWidget {
       title: Text(text),
       onTap: onTap,
     );
+  }
+}
+
+Future<Map<String, dynamic>?> getUserDetails(String userId) async {
+  try {
+    // Reference to the USERS collection
+    DocumentSnapshot userDoc =
+        await FirebaseFirestore.instance.collection('USERS').doc(userId).get();
+
+    // Check if the document exists
+    if (userDoc.exists) {
+      // Access and return the data
+
+      return userDoc.data() as Map<String, dynamic>?;
+    } else {
+      print("User does not exist");
+      return null;
+    }
+  } catch (e) {
+    print("user Error getting user details: $e");
+    return null;
+  }
+}
+
+Future<String?> getCurrentUserId() async {
+  // Get the currently signed-in user
+  User? currentUser = FirebaseAuth.instance.currentUser;
+
+  // Check if a user is signed in
+  if (currentUser != null) {
+    String userId = currentUser.uid;
+    print("Current User ID: $userId");
+    return userId.toString();
+    // You can use the userId as needed in your application
+  } else {
+    print("No user is currently signed in.");
+    return "";
   }
 }
