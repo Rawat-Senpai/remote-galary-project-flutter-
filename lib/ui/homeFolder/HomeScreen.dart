@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:photo_storage_application/utils/app_constants.dart';
@@ -14,17 +15,34 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  File? _image1;
-  File? _image2;
+  File? _selectedImage;
 
-  void _setImage(File? image, int boxNumber) {
+  void _setImage(File? image) {
     setState(() {
-      if (boxNumber == 1) {
-        _image1 = image;
-      } else {
-        _image2 = image;
-      }
+      _selectedImage = image;
     });
+  }
+
+  Future<void> _uploadImage() async {
+    if (_selectedImage == null) return;
+
+    try {
+      // Creating a reference to the Firebase Storage location
+      final storageRef = FirebaseStorage.instanceFor(
+        bucket: 'fluttergalaryproject.appspot.com/files',
+      ).ref().child('images/${DateTime.now().toString()}.jpg');
+
+      // Uploading the image to Firebase Storage
+      final uploadTask = storageRef.putFile(_selectedImage!);
+
+      // Get the download URL after upload
+      final snapshot = await uploadTask.whenComplete(() => {});
+      final downloadUrl = await snapshot.ref.getDownloadURL();
+
+      print('Image uploaded! Download URL: $downloadUrl');
+    } catch (e) {
+      print('Error uploading image: $e');
+    }
   }
 
   @override
@@ -35,31 +53,27 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            _buildImageBox(_image1, 1),
+            ElevatedButton(
+              onPressed: () =>
+                  ImagePickerService.pickImageFromCamera(_setImage),
+              child: Text("Take Image from Camera"),
+            ),
+            ElevatedButton(
+              onPressed: () =>
+                  ImagePickerService.pickImageFromGallery(_setImage),
+              child: Text("Take Image from Gallery"),
+            ),
             SizedBox(height: 20),
-            _buildImageBox(_image2, 2),
+            _selectedImage != null
+                ? Image.file(_selectedImage!, height: 150)
+                : Text("No Image Selected"),
+            SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: _uploadImage,
+              child: Text("Upload Image to Firebase"),
+            ),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildImageBox(File? image, int boxNumber) {
-    return GestureDetector(
-      onTap: () => ImagePickerService.showPicker(context, (pickedImage) {
-        _setImage(pickedImage, boxNumber);
-      }),
-      child: Container(
-        height: 150,
-        width: double.infinity,
-        decoration: BoxDecoration(
-          color: Colors.grey[300],
-          borderRadius: BorderRadius.circular(10),
-          image: image != null
-              ? DecorationImage(image: FileImage(image), fit: BoxFit.cover)
-              : null,
-        ),
-        child: image == null ? Center(child: Text("Select Photo")) : null,
       ),
     );
   }
